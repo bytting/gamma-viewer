@@ -50,6 +50,8 @@ namespace gamma_viewer
 
         List<Spectrum> spectrums = new List<Spectrum>();
 
+        System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+
         public FormMain()
         {
             InitializeComponent();
@@ -71,6 +73,49 @@ namespace gamma_viewer
             {
                 cboxMapProviders.SelectedIndex = idx;
             }
+
+            timer.Interval = 2000;
+            timer.Tick += timer_Tick;
+            timer.Start();
+        }
+
+        void timer_Tick(object sender, EventArgs e)
+        {
+            if (spectrums.Count < 1 || String.IsNullOrEmpty(settings.Hostname) || lbSessions.SelectedIndices.Count < 1)
+                return;
+
+            String session = lbSessions.SelectedItems[0] as String;
+
+            DateTime lastSpectrumTime = spectrums[0].StartTime;
+            foreach(Spectrum spec in spectrums)
+            {
+                if (spec.StartTime > lastSpectrumTime)
+                    lastSpectrumTime = spec.StartTime;
+            }
+
+            string timeString = lastSpectrumTime.ToString("yyyyMMdd_hhmmss");
+
+            try
+            {
+                HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-spectrums/" + session + "/" + timeString);
+                req.Method = WebRequestMethods.Http.Get;
+                req.Accept = "application/json";
+
+                string jsonText;
+                HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
+                using (var sr = new StreamReader(resp.GetResponseStream()))
+                {
+                    jsonText = sr.ReadToEnd();
+                }
+
+                List<Spectrum> specs = JsonConvert.DeserializeObject<List<Spectrum>>(jsonText);
+                foreach (Spectrum spec in specs)
+                {
+                    spectrums.Add(spec);
+                    AddMarker(spec);
+                }
+            }
+            catch { }
         }
 
         private void LoadSettings()
@@ -205,26 +250,33 @@ namespace gamma_viewer
                 return;
             }
 
-            String session = lbSessions.SelectedItems[0] as String;
-            RemoveAllMarkers();
-
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-spectrums/" + session);
-            req.Method = WebRequestMethods.Http.Get;
-            req.Accept = "application/json";
-
-            string jsonText;
-            HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
-            using (var sr = new StreamReader(resp.GetResponseStream()))
+            try
             {
-                jsonText = sr.ReadToEnd();
+                String session = lbSessions.SelectedItems[0] as String;
+                RemoveAllMarkers();
+
+                HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-spectrums/" + session);
+                req.Method = WebRequestMethods.Http.Get;
+                req.Accept = "application/json";
+
+                string jsonText;
+                HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
+                using (var sr = new StreamReader(resp.GetResponseStream()))
+                {
+                    jsonText = sr.ReadToEnd();
+                }
+
+                spectrums.Clear();
+                List<Spectrum> specs = JsonConvert.DeserializeObject<List<Spectrum>>(jsonText);
+                foreach (Spectrum spec in specs)
+                {
+                    spectrums.Add(spec);
+                    AddMarker(spec);
+                }
             }
-
-            spectrums.Clear();
-            List<Spectrum> specs = JsonConvert.DeserializeObject<List<Spectrum>>(jsonText);
-            foreach (Spectrum spec in specs)
+            catch (Exception ex)
             {
-                spectrums.Add(spec);
-                AddMarker(spec);
+                MessageBox.Show("Error: " + ex.Message);
             }
         }
 
@@ -246,23 +298,35 @@ namespace gamma_viewer
                 return;
             }
 
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-sessions");
-            req.Method = WebRequestMethods.Http.Get;
-            req.Accept = "application/json";
-
-            string jsonText;
-            HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
-            using (var sr = new StreamReader(resp.GetResponseStream()))
+            try
             {
-                jsonText = sr.ReadToEnd();
-            }
+                HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-sessions");
+                req.Method = WebRequestMethods.Http.Get;
+                req.Accept = "application/json";
 
-            lbSessions.Items.Clear();
-            List<string> sessions = JsonConvert.DeserializeObject<List<string>>(jsonText);
-            foreach (string session in sessions)
-            {
-                lbSessions.Items.Add(session);
+                string jsonText;
+                HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
+                using (var sr = new StreamReader(resp.GetResponseStream()))
+                {
+                    jsonText = sr.ReadToEnd();
+                }
+
+                lbSessions.Items.Clear();
+                List<string> sessions = JsonConvert.DeserializeObject<List<string>>(jsonText);
+                foreach (string session in sessions)
+                {
+                    lbSessions.Items.Add(session);
+                }
             }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
+
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            timer.Stop();
         }
     }    
 }
