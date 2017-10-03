@@ -31,8 +31,8 @@ namespace gamma_viewer
         [JsonProperty("session_name")]
         public string SessionName { get; set; }
 
-        [JsonProperty("session_id")]
-        public int SessionId { get; set; }
+        [JsonProperty("session_index")]
+        public int SessionIndex { get; set; }
 
         [JsonProperty("start_time")]
         public DateTime StartTime { get; set; }
