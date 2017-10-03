@@ -37,6 +37,8 @@ namespace gamma_viewer
 {
     public partial class FormMain : Form
     {
+        string hostname = "localhost";
+
         GMapOverlay overlay = new GMapOverlay();
 
         private Bitmap bmpBlue = new Bitmap(gamma_viewer.Properties.Resources.marker_blue_10);
@@ -68,32 +70,6 @@ namespace gamma_viewer
         private void menuItemExit_Click(object sender, EventArgs e)
         {
             Close();
-        }
-
-        private void menuItemUpdateSessions_Click(object sender, EventArgs e)
-        {
-            // update sessions
-        }
-
-        private void menuItemConnectToServer_Click(object sender, EventArgs e)
-        {
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://10.10.10.75/get-sessions");
-            req.Method = WebRequestMethods.Http.Get;
-            req.Accept = "application/json";
-
-            string jsonText;
-            HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
-            using (var sr = new StreamReader(resp.GetResponseStream()))
-            {
-                jsonText = sr.ReadToEnd();
-            }
-
-            lbSessions.Items.Clear();
-            List<string> sessions = JsonConvert.DeserializeObject<List<string>>(jsonText);
-            foreach(string session in sessions)
-            {
-                lbSessions.Items.Add(session);
-            }
         }
 
         private void cboxMapProviders_SelectedIndexChanged(object sender, EventArgs e)
@@ -198,7 +174,7 @@ namespace gamma_viewer
             String session = lbSessions.SelectedItems[0] as String;
             RemoveAllMarkers();
 
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://10.10.10.75/get-spectrums/" + session);
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://" + hostname + "/get-spectrums/" + session);
             req.Method = WebRequestMethods.Http.Get;
             req.Accept = "application/json";
 
@@ -215,6 +191,36 @@ namespace gamma_viewer
             {
                 spectrums.Add(spec);
                 AddMarker(spec);
+            }
+        }
+
+        private void menuItemSetIP_Click(object sender, EventArgs e)
+        {
+            FormGetHostname form = new FormGetHostname(hostname);
+            if (form.ShowDialog() != DialogResult.OK)
+                return;
+
+            hostname = form.Hostname;
+        }
+
+        private void menuItemGetSessions_Click(object sender, EventArgs e)
+        {
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://" + hostname + "/get-sessions");
+            req.Method = WebRequestMethods.Http.Get;
+            req.Accept = "application/json";
+
+            string jsonText;
+            HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
+            using (var sr = new StreamReader(resp.GetResponseStream()))
+            {
+                jsonText = sr.ReadToEnd();
+            }
+
+            lbSessions.Items.Clear();
+            List<string> sessions = JsonConvert.DeserializeObject<List<string>>(jsonText);
+            foreach (string session in sessions)
+            {
+                lbSessions.Items.Add(session);
             }
         }
     }    

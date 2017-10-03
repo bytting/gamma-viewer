@@ -30,21 +30,20 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             this.menu = new System.Windows.Forms.MenuStrip();
-            this.status = new System.Windows.Forms.StatusStrip();
             this.menuItemFile = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
-            this.splitMain = new System.Windows.Forms.SplitContainer();
-            this.toolsSessions = new System.Windows.Forms.ToolStrip();
-            this.toolsMap = new System.Windows.Forms.ToolStrip();
-            this.lbSessions = new System.Windows.Forms.ListBox();
-            this.btnUpdateSessions = new System.Windows.Forms.ToolStripButton();
-            this.menuItemAction = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemUpdateSessions = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemConnectToServer = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.btnConnectToServer = new System.Windows.Forms.ToolStripButton();
+            this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.status = new System.Windows.Forms.StatusStrip();
+            this.splitMain = new System.Windows.Forms.SplitContainer();
+            this.lbSessions = new System.Windows.Forms.ListBox();
+            this.toolsSessions = new System.Windows.Forms.ToolStrip();
             this.gmap = new GMap.NET.WindowsForms.GMapControl();
+            this.toolsMap = new System.Windows.Forms.ToolStrip();
             this.cboxMapProviders = new System.Windows.Forms.ToolStripComboBox();
+            this.menuItemSetIP = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnConnectToServer = new System.Windows.Forms.ToolStripButton();
+            this.btnUpdateSessions = new System.Windows.Forms.ToolStripButton();
+            this.menuItemGetSessions = new System.Windows.Forms.ToolStripMenuItem();
             this.menu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitMain)).BeginInit();
             this.splitMain.Panel1.SuspendLayout();
@@ -57,42 +56,50 @@
             // menu
             // 
             this.menu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemFile,
-            this.menuItemAction});
+            this.menuItemFile});
             this.menu.Location = new System.Drawing.Point(0, 0);
             this.menu.Name = "menu";
-            this.menu.Size = new System.Drawing.Size(1099, 24);
+            this.menu.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
+            this.menu.Size = new System.Drawing.Size(1282, 24);
             this.menu.TabIndex = 0;
             this.menu.Text = "menuStrip1";
-            // 
-            // status
-            // 
-            this.status.Location = new System.Drawing.Point(0, 701);
-            this.status.Name = "status";
-            this.status.Size = new System.Drawing.Size(1099, 22);
-            this.status.TabIndex = 2;
-            this.status.Text = "statusStrip1";
             // 
             // menuItemFile
             // 
             this.menuItemFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemConnectToServer,
+            this.menuItemSetIP,
+            this.menuItemGetSessions,
             this.toolStripSeparator1,
             this.menuItemExit});
             this.menuItemFile.Name = "menuItemFile";
             this.menuItemFile.Size = new System.Drawing.Size(37, 20);
             this.menuItemFile.Text = "&File";
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(166, 6);
+            // 
             // menuItemExit
             // 
             this.menuItemExit.Name = "menuItemExit";
-            this.menuItemExit.Size = new System.Drawing.Size(167, 22);
+            this.menuItemExit.Size = new System.Drawing.Size(169, 22);
             this.menuItemExit.Text = "E&xit";
             this.menuItemExit.Click += new System.EventHandler(this.menuItemExit_Click);
+            // 
+            // status
+            // 
+            this.status.Location = new System.Drawing.Point(0, 753);
+            this.status.Name = "status";
+            this.status.Padding = new System.Windows.Forms.Padding(1, 0, 16, 0);
+            this.status.Size = new System.Drawing.Size(1282, 22);
+            this.status.TabIndex = 2;
+            this.status.Text = "statusStrip1";
             // 
             // splitMain
             // 
             this.splitMain.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitMain.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitMain.Location = new System.Drawing.Point(0, 24);
             this.splitMain.Name = "splitMain";
             // 
@@ -105,9 +112,23 @@
             // 
             this.splitMain.Panel2.Controls.Add(this.gmap);
             this.splitMain.Panel2.Controls.Add(this.toolsMap);
-            this.splitMain.Size = new System.Drawing.Size(1099, 677);
-            this.splitMain.SplitterDistance = 243;
+            this.splitMain.Size = new System.Drawing.Size(1282, 729);
+            this.splitMain.SplitterDistance = 144;
+            this.splitMain.SplitterWidth = 5;
             this.splitMain.TabIndex = 3;
+            // 
+            // lbSessions
+            // 
+            this.lbSessions.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.lbSessions.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.lbSessions.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lbSessions.FormattingEnabled = true;
+            this.lbSessions.ItemHeight = 15;
+            this.lbSessions.Location = new System.Drawing.Point(0, 25);
+            this.lbSessions.Name = "lbSessions";
+            this.lbSessions.Size = new System.Drawing.Size(144, 704);
+            this.lbSessions.TabIndex = 1;
+            this.lbSessions.SelectedIndexChanged += new System.EventHandler(this.lbSessions_SelectedIndexChanged);
             // 
             // toolsSessions
             // 
@@ -117,80 +138,9 @@
             this.btnUpdateSessions});
             this.toolsSessions.Location = new System.Drawing.Point(0, 0);
             this.toolsSessions.Name = "toolsSessions";
-            this.toolsSessions.Size = new System.Drawing.Size(243, 25);
+            this.toolsSessions.Size = new System.Drawing.Size(144, 25);
             this.toolsSessions.TabIndex = 0;
             this.toolsSessions.Text = "toolStrip1";
-            // 
-            // toolsMap
-            // 
-            this.toolsMap.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.toolsMap.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.cboxMapProviders});
-            this.toolsMap.Location = new System.Drawing.Point(0, 0);
-            this.toolsMap.Name = "toolsMap";
-            this.toolsMap.Size = new System.Drawing.Size(852, 25);
-            this.toolsMap.TabIndex = 0;
-            this.toolsMap.Text = "toolStrip2";
-            // 
-            // lbSessions
-            // 
-            this.lbSessions.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.lbSessions.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.lbSessions.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lbSessions.FormattingEnabled = true;
-            this.lbSessions.ItemHeight = 14;
-            this.lbSessions.Location = new System.Drawing.Point(0, 25);
-            this.lbSessions.Name = "lbSessions";
-            this.lbSessions.Size = new System.Drawing.Size(243, 652);
-            this.lbSessions.TabIndex = 1;
-            this.lbSessions.SelectedIndexChanged += new System.EventHandler(this.lbSessions_SelectedIndexChanged);
-            // 
-            // btnUpdateSessions
-            // 
-            this.btnUpdateSessions.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnUpdateSessions.Image = ((System.Drawing.Image)(resources.GetObject("btnUpdateSessions.Image")));
-            this.btnUpdateSessions.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnUpdateSessions.Name = "btnUpdateSessions";
-            this.btnUpdateSessions.Size = new System.Drawing.Size(23, 22);
-            this.btnUpdateSessions.Text = "toolStripButton1";
-            this.btnUpdateSessions.Click += new System.EventHandler(this.menuItemUpdateSessions_Click);
-            // 
-            // menuItemAction
-            // 
-            this.menuItemAction.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemUpdateSessions});
-            this.menuItemAction.Name = "menuItemAction";
-            this.menuItemAction.Size = new System.Drawing.Size(54, 20);
-            this.menuItemAction.Text = "&Action";
-            // 
-            // menuItemUpdateSessions
-            // 
-            this.menuItemUpdateSessions.Name = "menuItemUpdateSessions";
-            this.menuItemUpdateSessions.Size = new System.Drawing.Size(158, 22);
-            this.menuItemUpdateSessions.Text = "&Update sessions";
-            this.menuItemUpdateSessions.Click += new System.EventHandler(this.menuItemUpdateSessions_Click);
-            // 
-            // menuItemConnectToServer
-            // 
-            this.menuItemConnectToServer.Name = "menuItemConnectToServer";
-            this.menuItemConnectToServer.Size = new System.Drawing.Size(167, 22);
-            this.menuItemConnectToServer.Text = "&Connect to server";
-            this.menuItemConnectToServer.Click += new System.EventHandler(this.menuItemConnectToServer_Click);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(164, 6);
-            // 
-            // btnConnectToServer
-            // 
-            this.btnConnectToServer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnConnectToServer.Image = ((System.Drawing.Image)(resources.GetObject("btnConnectToServer.Image")));
-            this.btnConnectToServer.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnConnectToServer.Name = "btnConnectToServer";
-            this.btnConnectToServer.Size = new System.Drawing.Size(23, 22);
-            this.btnConnectToServer.Text = "toolStripButton1";
-            this.btnConnectToServer.Click += new System.EventHandler(this.menuItemConnectToServer_Click);
             // 
             // gmap
             // 
@@ -214,9 +164,20 @@
             this.gmap.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gmap.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gmap.ShowTileGridLines = false;
-            this.gmap.Size = new System.Drawing.Size(852, 652);
+            this.gmap.Size = new System.Drawing.Size(1133, 704);
             this.gmap.TabIndex = 1;
             this.gmap.Zoom = 4D;
+            // 
+            // toolsMap
+            // 
+            this.toolsMap.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.toolsMap.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cboxMapProviders});
+            this.toolsMap.Location = new System.Drawing.Point(0, 0);
+            this.toolsMap.Name = "toolsMap";
+            this.toolsMap.Size = new System.Drawing.Size(1133, 25);
+            this.toolsMap.TabIndex = 0;
+            this.toolsMap.Text = "toolStrip2";
             // 
             // cboxMapProviders
             // 
@@ -240,14 +201,51 @@
             this.cboxMapProviders.Size = new System.Drawing.Size(121, 25);
             this.cboxMapProviders.SelectedIndexChanged += new System.EventHandler(this.cboxMapProviders_SelectedIndexChanged);
             // 
+            // menuItemSetIP
+            // 
+            this.menuItemSetIP.Name = "menuItemSetIP";
+            this.menuItemSetIP.Size = new System.Drawing.Size(169, 22);
+            this.menuItemSetIP.Text = "Set IP / Hostname";
+            this.menuItemSetIP.Click += new System.EventHandler(this.menuItemSetIP_Click);
+            // 
+            // btnConnectToServer
+            // 
+            this.btnConnectToServer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnConnectToServer.Image = ((System.Drawing.Image)(resources.GetObject("btnConnectToServer.Image")));
+            this.btnConnectToServer.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnConnectToServer.Name = "btnConnectToServer";
+            this.btnConnectToServer.Size = new System.Drawing.Size(23, 22);
+            this.btnConnectToServer.Text = "toolStripButton1";
+            this.btnConnectToServer.ToolTipText = "Set IP address / Hostname of web service";
+            this.btnConnectToServer.Click += new System.EventHandler(this.menuItemSetIP_Click);
+            // 
+            // btnUpdateSessions
+            // 
+            this.btnUpdateSessions.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnUpdateSessions.Image = ((System.Drawing.Image)(resources.GetObject("btnUpdateSessions.Image")));
+            this.btnUpdateSessions.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnUpdateSessions.Name = "btnUpdateSessions";
+            this.btnUpdateSessions.Size = new System.Drawing.Size(23, 22);
+            this.btnUpdateSessions.Text = "toolStripButton1";
+            this.btnUpdateSessions.ToolTipText = "Get a fresh list of sessions from web service";
+            this.btnUpdateSessions.Click += new System.EventHandler(this.menuItemGetSessions_Click);
+            // 
+            // menuItemGetSessions
+            // 
+            this.menuItemGetSessions.Name = "menuItemGetSessions";
+            this.menuItemGetSessions.Size = new System.Drawing.Size(169, 22);
+            this.menuItemGetSessions.Text = "Get sessions";
+            this.menuItemGetSessions.Click += new System.EventHandler(this.menuItemGetSessions_Click);
+            // 
             // FormMain
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1099, 723);
+            this.ClientSize = new System.Drawing.Size(1282, 775);
             this.Controls.Add(this.splitMain);
             this.Controls.Add(this.status);
             this.Controls.Add(this.menu);
+            this.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menu;
             this.Name = "FormMain";
@@ -280,14 +278,13 @@
         private System.Windows.Forms.ListBox lbSessions;
         private System.Windows.Forms.ToolStrip toolsSessions;
         private System.Windows.Forms.ToolStrip toolsMap;
-        private System.Windows.Forms.ToolStripMenuItem menuItemAction;
-        private System.Windows.Forms.ToolStripMenuItem menuItemUpdateSessions;
         private System.Windows.Forms.ToolStripButton btnUpdateSessions;
-        private System.Windows.Forms.ToolStripMenuItem menuItemConnectToServer;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripButton btnConnectToServer;
         private GMap.NET.WindowsForms.GMapControl gmap;
         private System.Windows.Forms.ToolStripComboBox cboxMapProviders;
+        private System.Windows.Forms.ToolStripMenuItem menuItemSetIP;
+        private System.Windows.Forms.ToolStripMenuItem menuItemGetSessions;
     }
 }
 
