@@ -93,6 +93,7 @@ namespace gamma_viewer
                     lastSpectrumTime = spec.StartTime;
             }
 
+            lastSpectrumTime.AddSeconds(1.0);
             string timeString = lastSpectrumTime.ToString("yyyyMMdd_hhmmss");
 
             try
