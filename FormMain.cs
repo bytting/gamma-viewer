@@ -32,13 +32,14 @@ using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
 using System.IO;
 using Newtonsoft.Json;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace gamma_viewer
 {
     public partial class FormMain : Form
     {
-        string hostname = "localhost";
-
+        GVSettings settings = new GVSettings();        
         GMapOverlay overlay = new GMapOverlay();
 
         private Bitmap bmpBlue = new Bitmap(gamma_viewer.Properties.Resources.marker_blue_10);
@@ -56,6 +57,11 @@ namespace gamma_viewer
 
         private void FormMain_Load(object sender, EventArgs e)
         {
+            if (!Directory.Exists(Env.SettingsPath))
+                Directory.CreateDirectory(Env.SettingsPath);
+
+            LoadSettings();
+
             gmap.Overlays.Add(overlay);
             gmap.Position = new PointLatLng(59.946534, 10.598574);
 
@@ -67,6 +73,28 @@ namespace gamma_viewer
             }
         }
 
+        private void LoadSettings()
+        {
+            if (!File.Exists(Env.SettingsFile))
+                SaveSettings();
+
+            // Deserialize settings from file
+            using (StreamReader sr = new StreamReader(Env.SettingsFile))
+            {
+                XmlSerializer x = new XmlSerializer(settings.GetType());
+                settings = x.Deserialize(sr) as GVSettings;
+            }
+        }
+
+        private void SaveSettings()
+        {            
+            using (StreamWriter sw = new StreamWriter(Env.SettingsFile))
+            {
+                XmlSerializer x = new XmlSerializer(settings.GetType());
+                x.Serialize(sw, settings);
+            }
+        }
+        
         private void menuItemExit_Click(object sender, EventArgs e)
         {
             Close();
@@ -171,10 +199,16 @@ namespace gamma_viewer
             if (lbSessions.SelectedIndices.Count < 1)
                 return;
 
+            if (String.IsNullOrEmpty(settings.Hostname))
+            {
+                MessageBox.Show("You must set a IP / Hostname to the web service first");
+                return;
+            }
+
             String session = lbSessions.SelectedItems[0] as String;
             RemoveAllMarkers();
 
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://" + hostname + "/get-spectrums/" + session);
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-spectrums/" + session);
             req.Method = WebRequestMethods.Http.Get;
             req.Accept = "application/json";
 
@@ -196,16 +230,23 @@ namespace gamma_viewer
 
         private void menuItemSetIP_Click(object sender, EventArgs e)
         {
-            FormGetHostname form = new FormGetHostname(hostname);
+            FormGetHostname form = new FormGetHostname(settings.Hostname);
             if (form.ShowDialog() != DialogResult.OK)
                 return;
 
-            hostname = form.Hostname;
+            settings.Hostname = form.Hostname;
+            SaveSettings();
         }
 
         private void menuItemGetSessions_Click(object sender, EventArgs e)
         {
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://" + hostname + "/get-sessions");
+            if(String.IsNullOrEmpty(settings.Hostname))
+            {
+                MessageBox.Show("You must set a IP / Hostname to the web service first");
+                return;
+            }
+
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-sessions");
             req.Method = WebRequestMethods.Http.Get;
             req.Accept = "application/json";
 
