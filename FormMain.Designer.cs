@@ -41,12 +41,12 @@
             this.splitMain = new System.Windows.Forms.SplitContainer();
             this.lbSessions = new System.Windows.Forms.ListBox();
             this.toolsSessions = new System.Windows.Forms.ToolStrip();
-            this.gmap = new GMap.NET.WindowsForms.GMapControl();
-            this.toolsMap = new System.Windows.Forms.ToolStrip();
-            this.cboxMapProviders = new System.Windows.Forms.ToolStripComboBox();
             this.btnConnectToServer = new System.Windows.Forms.ToolStripButton();
             this.btnUpdateSessions = new System.Windows.Forms.ToolStripButton();
+            this.gmap = new GMap.NET.WindowsForms.GMapControl();
+            this.toolsMap = new System.Windows.Forms.ToolStrip();
             this.btnSyncSession = new System.Windows.Forms.ToolStripButton();
+            this.cboxMapProviders = new System.Windows.Forms.ToolStripComboBox();
             this.menu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitMain)).BeginInit();
             this.splitMain.Panel1.SuspendLayout();
@@ -175,6 +175,28 @@
             this.toolsSessions.TabIndex = 0;
             this.toolsSessions.Text = "toolStrip1";
             // 
+            // btnConnectToServer
+            // 
+            this.btnConnectToServer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnConnectToServer.Image = global::gamma_viewer.Properties.Resources.connect_32;
+            this.btnConnectToServer.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnConnectToServer.Name = "btnConnectToServer";
+            this.btnConnectToServer.Size = new System.Drawing.Size(23, 22);
+            this.btnConnectToServer.Text = "Set host";
+            this.btnConnectToServer.ToolTipText = "Set IP address / Hostname of web service";
+            this.btnConnectToServer.Click += new System.EventHandler(this.menuItemSetIP_Click);
+            // 
+            // btnUpdateSessions
+            // 
+            this.btnUpdateSessions.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnUpdateSessions.Image = global::gamma_viewer.Properties.Resources.sessions_32;
+            this.btnUpdateSessions.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnUpdateSessions.Name = "btnUpdateSessions";
+            this.btnUpdateSessions.Size = new System.Drawing.Size(23, 22);
+            this.btnUpdateSessions.Text = "Update session list";
+            this.btnUpdateSessions.ToolTipText = "Get a fresh list of sessions from web service";
+            this.btnUpdateSessions.Click += new System.EventHandler(this.menuItemGetSessions_Click);
+            // 
             // gmap
             // 
             this.gmap.Bearing = 0F;
@@ -213,6 +235,17 @@
             this.toolsMap.TabIndex = 0;
             this.toolsMap.Text = "toolStrip2";
             // 
+            // btnSyncSession
+            // 
+            this.btnSyncSession.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnSyncSession.Image = global::gamma_viewer.Properties.Resources.sync_32;
+            this.btnSyncSession.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSyncSession.Name = "btnSyncSession";
+            this.btnSyncSession.Size = new System.Drawing.Size(23, 22);
+            this.btnSyncSession.Text = "Sync session";
+            this.btnSyncSession.ToolTipText = "Sync current session with web service";
+            this.btnSyncSession.Click += new System.EventHandler(this.menuItemSyncSession_Click);
+            // 
             // cboxMapProviders
             // 
             this.cboxMapProviders.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -234,38 +267,6 @@
             this.cboxMapProviders.Name = "cboxMapProviders";
             this.cboxMapProviders.Size = new System.Drawing.Size(121, 25);
             this.cboxMapProviders.SelectedIndexChanged += new System.EventHandler(this.cboxMapProviders_SelectedIndexChanged);
-            // 
-            // btnConnectToServer
-            // 
-            this.btnConnectToServer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnConnectToServer.Image = global::gamma_viewer.Properties.Resources.connect_32;
-            this.btnConnectToServer.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnConnectToServer.Name = "btnConnectToServer";
-            this.btnConnectToServer.Size = new System.Drawing.Size(23, 22);
-            this.btnConnectToServer.Text = "toolStripButton1";
-            this.btnConnectToServer.ToolTipText = "Set IP address / Hostname of web service";
-            this.btnConnectToServer.Click += new System.EventHandler(this.menuItemSetIP_Click);
-            // 
-            // btnUpdateSessions
-            // 
-            this.btnUpdateSessions.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnUpdateSessions.Image = global::gamma_viewer.Properties.Resources.sessions_32;
-            this.btnUpdateSessions.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnUpdateSessions.Name = "btnUpdateSessions";
-            this.btnUpdateSessions.Size = new System.Drawing.Size(23, 22);
-            this.btnUpdateSessions.Text = "toolStripButton1";
-            this.btnUpdateSessions.ToolTipText = "Get a fresh list of sessions from web service";
-            this.btnUpdateSessions.Click += new System.EventHandler(this.menuItemGetSessions_Click);
-            // 
-            // btnSyncSession
-            // 
-            this.btnSyncSession.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnSyncSession.Image = global::gamma_viewer.Properties.Resources.sync_32;
-            this.btnSyncSession.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnSyncSession.Name = "btnSyncSession";
-            this.btnSyncSession.Size = new System.Drawing.Size(23, 22);
-            this.btnSyncSession.Text = "toolStripButton1";
-            this.btnSyncSession.Click += new System.EventHandler(this.menuItemSyncSession_Click);
             // 
             // FormMain
             // 
