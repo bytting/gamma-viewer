@@ -18,6 +18,7 @@
 // Authors: Dag Robole,
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -30,15 +31,22 @@ using GMap.NET;
 using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
-using System.IO;
 using Newtonsoft.Json;
 using System.Xml;
 using System.Xml.Serialization;
+using log4net;
+using log4net.Core;
+using log4net.Appender;
+using log4net.Layout;
+using log4net.Repository.Hierarchy;
 
 namespace gamma_viewer
 {
     public partial class FormMain : Form
     {
+        private static bool LogInitialized = false;
+        private static ILog Log = null;
+
         GVSettings settings = new GVSettings();        
         GMapOverlay overlay = new GMapOverlay();
 
@@ -62,6 +70,9 @@ namespace gamma_viewer
             if (!Directory.Exists(Env.SettingsPath))
                 Directory.CreateDirectory(Env.SettingsPath);
 
+            Log = GetLog();
+            Log.Info("Starting GammaViewer");
+
             LoadSettings();
 
             gmap.Overlays.Add(overlay);
@@ -74,9 +85,40 @@ namespace gamma_viewer
                 cboxMapProviders.SelectedIndex = idx;
             }
 
-            timer.Interval = 2000;
+            timer.Interval = settings.RequestFrequency;
             timer.Tick += timer_Tick;
             timer.Start();
+        }
+
+        public static ILog GetLog()
+        {
+            if (!LogInitialized)
+            {
+                LogInitialized = true;
+
+                Hierarchy hierarchy = (Hierarchy)LogManager.GetRepository();
+
+                PatternLayout patternLayout = new PatternLayout();
+                patternLayout.ConversionPattern = "%date [%thread] - %message%newline";
+                patternLayout.ActivateOptions();
+
+                RollingFileAppender roller = new RollingFileAppender();
+                roller.AppendToFile = false;
+                roller.File = Env.SettingsPath + Path.DirectorySeparatorChar + "gamma-viewer.log";
+                roller.Layout = patternLayout;
+                roller.MaxSizeRollBackups = 3;
+                roller.MaximumFileSize = "10MB";
+                roller.RollingStyle = RollingFileAppender.RollingMode.Size;
+                roller.StaticLogFileName = true;
+                roller.ActivateOptions();
+                hierarchy.Root.AddAppender(roller);
+                hierarchy.Root.Level = Level.All;
+                hierarchy.Configured = true;
+
+                Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            }
+
+            return Log;
         }
 
         void timer_Tick(object sender, EventArgs e)
@@ -98,16 +140,15 @@ namespace gamma_viewer
 
             try
             {
-                HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-spectrums/" + session + "/" + timeString);
-                req.Method = WebRequestMethods.Http.Get;
-                req.Accept = "application/json";
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-spectrums/" + session + "/" + timeString);
+                request.Timeout = 5000;
+                request.Method = WebRequestMethods.Http.Get;
+                request.Accept = "application/json";
 
                 string jsonText;
-                HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
-                using (var sr = new StreamReader(resp.GetResponseStream()))
-                {
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                using (var sr = new StreamReader(response.GetResponseStream()))                
                     jsonText = sr.ReadToEnd();
-                }
 
                 List<Spectrum> specs = JsonConvert.DeserializeObject<List<Spectrum>>(jsonText);
                 foreach (Spectrum spec in specs)
@@ -116,7 +157,10 @@ namespace gamma_viewer
                     AddMarker(spec);
                 }
             }
-            catch { }
+            catch(Exception ex)
+            {
+                Log.Error("Timed request error", ex);
+            }
         }
 
         private void LoadSettings()
@@ -143,6 +187,8 @@ namespace gamma_viewer
         
         private void menuItemExit_Click(object sender, EventArgs e)
         {
+            SaveSettings();
+            Log.Info("Exiting GammaViewer");
             Close();
         }
 
@@ -256,16 +302,15 @@ namespace gamma_viewer
                 String session = lbSessions.SelectedItems[0] as String;
                 RemoveAllMarkers();
 
-                HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-spectrums/" + session);
-                req.Method = WebRequestMethods.Http.Get;
-                req.Accept = "application/json";
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-spectrums/" + session);
+                request.Timeout = 5000;
+                request.Method = WebRequestMethods.Http.Get;
+                request.Accept = "application/json";
 
                 string jsonText;
-                HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
+                HttpWebResponse resp = (HttpWebResponse)request.GetResponse();
                 using (var sr = new StreamReader(resp.GetResponseStream()))
-                {
                     jsonText = sr.ReadToEnd();
-                }
 
                 spectrums.Clear();
                 List<Spectrum> specs = JsonConvert.DeserializeObject<List<Spectrum>>(jsonText);
@@ -277,7 +322,8 @@ namespace gamma_viewer
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                Log.Error("Session select error", ex);
+                MessageBox.Show("Session select error: " + ex.Message);
             }
         }
 
@@ -301,16 +347,15 @@ namespace gamma_viewer
 
             try
             {
-                HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-sessions");
-                req.Method = WebRequestMethods.Http.Get;
-                req.Accept = "application/json";
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-sessions");
+                request.Timeout = 5000;
+                request.Method = WebRequestMethods.Http.Get;
+                request.Accept = "application/json";
 
                 string jsonText;
-                HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
+                HttpWebResponse resp = (HttpWebResponse)request.GetResponse();
                 using (var sr = new StreamReader(resp.GetResponseStream()))
-                {
                     jsonText = sr.ReadToEnd();
-                }
 
                 lbSessions.Items.Clear();
                 List<string> sessions = JsonConvert.DeserializeObject<List<string>>(jsonText);
@@ -321,13 +366,19 @@ namespace gamma_viewer
             }
             catch(Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                Log.Error("Get sessions error", ex);
+                MessageBox.Show("Get sessions error: " + ex.Message);
             }
         }
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             timer.Stop();
+        }
+
+        private void menuItemSyncSession_Click(object sender, EventArgs e)
+        {
+            // sync
         }
     }    
 }

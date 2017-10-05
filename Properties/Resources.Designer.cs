@@ -63,6 +63,16 @@ namespace gamma_viewer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap connect_32 {
+            get {
+                object obj = ResourceManager.GetObject("connect-32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap marker_blue_10 {
             get {
                 object obj = ResourceManager.GetObject("marker_blue_10", resourceCulture);
@@ -116,6 +126,26 @@ namespace gamma_viewer.Properties {
         internal static System.Drawing.Bitmap marker_yellow_10 {
             get {
                 object obj = ResourceManager.GetObject("marker_yellow_10", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap sessions_32 {
+            get {
+                object obj = ResourceManager.GetObject("sessions-32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap sync_32 {
+            get {
+                object obj = ResourceManager.GetObject("sync-32", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

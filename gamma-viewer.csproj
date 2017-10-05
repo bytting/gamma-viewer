@@ -40,6 +40,10 @@
       <HintPath>packages\GMap.NET.WindowsForms.1.7\lib\net40\GMap.NET.WindowsForms.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -124,6 +128,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="images\marker-yellow-10.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\connect-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\sessions-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\sync-32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
