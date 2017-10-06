@@ -56,7 +56,7 @@ namespace gamma_viewer
         private Bitmap bmpOrange = new Bitmap(gamma_viewer.Properties.Resources.marker_orange_10);
         private Bitmap bmpRed = new Bitmap(gamma_viewer.Properties.Resources.marker_red_10);
 
-        List<Spectrum> spectrums = new List<Spectrum>();
+        Dictionary<string, List<Spectrum>> Spectrums = new Dictionary<string, List<Spectrum>>();
 
         System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
 
@@ -130,46 +130,50 @@ namespace gamma_viewer
                 || String.IsNullOrEmpty(settings.Username) 
                 || String.IsNullOrEmpty(settings.Password))
             {
-                Log.Warn("Sync cancelled due to missing settings");
+                Log.Warn("Sync canceled due to missing settings");
                 return;
-            }            
-
-            String session = lbSessions.SelectedItems[0] as String;
-
-            DateTime lastSpectrumTime = spectrums[0].StartTime;
-            foreach(Spectrum spec in spectrums)
-            {
-                if (spec.StartTime > lastSpectrumTime)
-                    lastSpectrumTime = spec.StartTime;
             }
 
-            lastSpectrumTime.AddSeconds(1.0);
-            string timeString = lastSpectrumTime.ToString("yyyyMMdd_hhmmss");
-
-            try
+            foreach (string session in lbSessions.SelectedItems)
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-spectrums/" + session + "/" + timeString);
-                string credentials = Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(settings.Username + ":" + settings.Password));
-                request.Headers.Add("Authorization", "Basic " + credentials);
-                request.Timeout = 5000;
-                request.Method = WebRequestMethods.Http.Get;
-                request.Accept = "application/json";
+                if (!Spectrums.ContainsKey(session))
+                    continue;
 
-                string jsonText;
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                using (var sr = new StreamReader(response.GetResponseStream()))                
-                    jsonText = sr.ReadToEnd();
-
-                List<Spectrum> specs = JsonConvert.DeserializeObject<List<Spectrum>>(jsonText);
-                foreach (Spectrum spec in specs)
+                DateTime lastSpectrumTime = new DateTime(1900, 1, 1);
+                foreach (Spectrum spec in Spectrums[session])
                 {
-                    spectrums.Add(spec);
-                    AddMarker(spec);
+                    if (spec.StartTime > lastSpectrumTime)
+                        lastSpectrumTime = spec.StartTime;
                 }
-            }
-            catch(Exception ex)
-            {
-                Log.Error("Timed request error", ex);
+
+                lastSpectrumTime.AddSeconds(1.0);
+                string timeString = lastSpectrumTime.ToString("yyyyMMdd_hhmmss");
+
+                try
+                {
+                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-spectrums/" + session + "/" + timeString);
+                    string credentials = Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(settings.Username + ":" + settings.Password));
+                    request.Headers.Add("Authorization", "Basic " + credentials);
+                    request.Timeout = 5000;
+                    request.Method = WebRequestMethods.Http.Get;
+                    request.Accept = "application/json";
+
+                    string jsonText;
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    using (var sr = new StreamReader(response.GetResponseStream()))
+                        jsonText = sr.ReadToEnd();
+
+                    List<Spectrum> specs = JsonConvert.DeserializeObject<List<Spectrum>>(jsonText);
+                    foreach (Spectrum spec in specs)
+                    {
+                        Spectrums[session].Add(spec);
+                        AddMarker(spec);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Timed request error", ex);
+                }
             }
         }
 
@@ -309,29 +313,32 @@ namespace gamma_viewer
                 return;
             }
 
+            Spectrums.Clear();
+            RemoveAllMarkers();
+
             try
             {
-                String session = lbSessions.SelectedItems[0] as String;
-                RemoveAllMarkers();
-
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-spectrums/" + session);
-                string credentials = Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(settings.Username + ":" + settings.Password));
-                request.Headers.Add("Authorization", "Basic " + credentials);
-                request.Timeout = 5000;
-                request.Method = WebRequestMethods.Http.Get;
-                request.Accept = "application/json";
-
-                string jsonText;
-                HttpWebResponse resp = (HttpWebResponse)request.GetResponse();
-                using (var sr = new StreamReader(resp.GetResponseStream()))
-                    jsonText = sr.ReadToEnd();
-
-                spectrums.Clear();
-                List<Spectrum> specs = JsonConvert.DeserializeObject<List<Spectrum>>(jsonText);
-                foreach (Spectrum spec in specs)
+                foreach (string session in lbSessions.SelectedItems)
                 {
-                    spectrums.Add(spec);
-                    AddMarker(spec);
+                    Spectrums[session] = new List<Spectrum>();
+                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-spectrums/" + session);
+                    string credentials = Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(settings.Username + ":" + settings.Password));
+                    request.Headers.Add("Authorization", "Basic " + credentials);
+                    request.Timeout = 5000;
+                    request.Method = WebRequestMethods.Http.Get;
+                    request.Accept = "application/json";
+
+                    string jsonText;
+                    HttpWebResponse resp = (HttpWebResponse)request.GetResponse();
+                    using (var sr = new StreamReader(resp.GetResponseStream()))
+                        jsonText = sr.ReadToEnd();
+                    
+                    List<Spectrum> specs = JsonConvert.DeserializeObject<List<Spectrum>>(jsonText);
+                    foreach (Spectrum spec in specs)
+                    {
+                        Spectrums[session].Add(spec);
+                        AddMarker(spec);
+                    }
                 }
             }
             catch (Exception ex)
@@ -370,6 +377,9 @@ namespace gamma_viewer
                 return;
             }
 
+            Spectrums.Clear();
+            RemoveAllMarkers();
+
             try
             {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-sessions");
@@ -386,10 +396,8 @@ namespace gamma_viewer
 
                 lbSessions.Items.Clear();
                 List<string> sessions = JsonConvert.DeserializeObject<List<string>>(jsonText);
-                foreach (string session in sessions)
-                {
+                foreach (string session in sessions)                
                     lbSessions.Items.Add(session);
-                }
             }
             catch (Exception ex)
             {

@@ -36,6 +36,7 @@
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAction = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSyncSession = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemRequestSessionList = new System.Windows.Forms.ToolStripMenuItem();
             this.status = new System.Windows.Forms.StatusStrip();
             this.splitMain = new System.Windows.Forms.SplitContainer();
             this.lbSessions = new System.Windows.Forms.ListBox();
@@ -46,7 +47,6 @@
             this.toolsMap = new System.Windows.Forms.ToolStrip();
             this.btnSyncSession = new System.Windows.Forms.ToolStripButton();
             this.cboxMapProviders = new System.Windows.Forms.ToolStripComboBox();
-            this.menuItemRequestSessionList = new System.Windows.Forms.ToolStripMenuItem();
             this.menu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitMain)).BeginInit();
             this.splitMain.Panel1.SuspendLayout();
@@ -81,19 +81,19 @@
             // menuItemSettings
             // 
             this.menuItemSettings.Name = "menuItemSettings";
-            this.menuItemSettings.Size = new System.Drawing.Size(152, 22);
+            this.menuItemSettings.Size = new System.Drawing.Size(116, 22);
             this.menuItemSettings.Text = "Settings";
             this.menuItemSettings.Click += new System.EventHandler(this.menuItemSettings_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(113, 6);
             // 
             // menuItemExit
             // 
             this.menuItemExit.Name = "menuItemExit";
-            this.menuItemExit.Size = new System.Drawing.Size(152, 22);
+            this.menuItemExit.Size = new System.Drawing.Size(116, 22);
             this.menuItemExit.Text = "E&xit";
             this.menuItemExit.Click += new System.EventHandler(this.menuItemExit_Click);
             // 
@@ -112,6 +112,13 @@
             this.menuItemSyncSession.Size = new System.Drawing.Size(181, 22);
             this.menuItemSyncSession.Text = "Sync current session";
             this.menuItemSyncSession.Click += new System.EventHandler(this.menuItemSyncSession_Click);
+            // 
+            // menuItemRequestSessionList
+            // 
+            this.menuItemRequestSessionList.Name = "menuItemRequestSessionList";
+            this.menuItemRequestSessionList.Size = new System.Drawing.Size(181, 22);
+            this.menuItemRequestSessionList.Text = "Request session list";
+            this.menuItemRequestSessionList.Click += new System.EventHandler(this.menuItemRequestSessionList_Click);
             // 
             // status
             // 
@@ -152,6 +159,7 @@
             this.lbSessions.ItemHeight = 15;
             this.lbSessions.Location = new System.Drawing.Point(0, 25);
             this.lbSessions.Name = "lbSessions";
+            this.lbSessions.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.lbSessions.Size = new System.Drawing.Size(144, 599);
             this.lbSessions.TabIndex = 1;
             this.lbSessions.SelectedIndexChanged += new System.EventHandler(this.lbSessions_SelectedIndexChanged);
@@ -262,13 +270,6 @@
             this.cboxMapProviders.Name = "cboxMapProviders";
             this.cboxMapProviders.Size = new System.Drawing.Size(121, 25);
             this.cboxMapProviders.SelectedIndexChanged += new System.EventHandler(this.cboxMapProviders_SelectedIndexChanged);
-            // 
-            // menuItemRequestSessionList
-            // 
-            this.menuItemRequestSessionList.Name = "menuItemRequestSessionList";
-            this.menuItemRequestSessionList.Size = new System.Drawing.Size(181, 22);
-            this.menuItemRequestSessionList.Text = "Request session list";
-            this.menuItemRequestSessionList.Click += new System.EventHandler(this.menuItemRequestSessionList_Click);
             // 
             // FormMain
             // 
