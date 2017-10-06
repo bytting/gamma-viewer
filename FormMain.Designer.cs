@@ -31,8 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             this.menu = new System.Windows.Forms.MenuStrip();
             this.menuItemFile = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemSetIP = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemGetSessions = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSettings = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAction = new System.Windows.Forms.ToolStripMenuItem();
@@ -47,6 +46,7 @@
             this.toolsMap = new System.Windows.Forms.ToolStrip();
             this.btnSyncSession = new System.Windows.Forms.ToolStripButton();
             this.cboxMapProviders = new System.Windows.Forms.ToolStripComboBox();
+            this.menuItemRequestSessionList = new System.Windows.Forms.ToolStripMenuItem();
             this.menu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitMain)).BeginInit();
             this.splitMain.Panel1.SuspendLayout();
@@ -64,51 +64,44 @@
             this.menu.Location = new System.Drawing.Point(0, 0);
             this.menu.Name = "menu";
             this.menu.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
-            this.menu.Size = new System.Drawing.Size(1282, 24);
+            this.menu.Size = new System.Drawing.Size(1119, 24);
             this.menu.TabIndex = 0;
             this.menu.Text = "menuStrip1";
             // 
             // menuItemFile
             // 
             this.menuItemFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemSetIP,
-            this.menuItemGetSessions,
+            this.menuItemSettings,
             this.toolStripSeparator1,
             this.menuItemExit});
             this.menuItemFile.Name = "menuItemFile";
             this.menuItemFile.Size = new System.Drawing.Size(37, 20);
             this.menuItemFile.Text = "&File";
             // 
-            // menuItemSetIP
+            // menuItemSettings
             // 
-            this.menuItemSetIP.Name = "menuItemSetIP";
-            this.menuItemSetIP.Size = new System.Drawing.Size(169, 22);
-            this.menuItemSetIP.Text = "Set IP / Hostname";
-            this.menuItemSetIP.Click += new System.EventHandler(this.menuItemSetIP_Click);
-            // 
-            // menuItemGetSessions
-            // 
-            this.menuItemGetSessions.Name = "menuItemGetSessions";
-            this.menuItemGetSessions.Size = new System.Drawing.Size(169, 22);
-            this.menuItemGetSessions.Text = "Get sessions";
-            this.menuItemGetSessions.Click += new System.EventHandler(this.menuItemGetSessions_Click);
+            this.menuItemSettings.Name = "menuItemSettings";
+            this.menuItemSettings.Size = new System.Drawing.Size(152, 22);
+            this.menuItemSettings.Text = "Settings";
+            this.menuItemSettings.Click += new System.EventHandler(this.menuItemSettings_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(166, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
             // 
             // menuItemExit
             // 
             this.menuItemExit.Name = "menuItemExit";
-            this.menuItemExit.Size = new System.Drawing.Size(169, 22);
+            this.menuItemExit.Size = new System.Drawing.Size(152, 22);
             this.menuItemExit.Text = "E&xit";
             this.menuItemExit.Click += new System.EventHandler(this.menuItemExit_Click);
             // 
             // menuItemAction
             // 
             this.menuItemAction.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemSyncSession});
+            this.menuItemSyncSession,
+            this.menuItemRequestSessionList});
             this.menuItemAction.Name = "menuItemAction";
             this.menuItemAction.Size = new System.Drawing.Size(54, 20);
             this.menuItemAction.Text = "Action";
@@ -116,16 +109,16 @@
             // menuItemSyncSession
             // 
             this.menuItemSyncSession.Name = "menuItemSyncSession";
-            this.menuItemSyncSession.Size = new System.Drawing.Size(140, 22);
-            this.menuItemSyncSession.Text = "Sync session";
+            this.menuItemSyncSession.Size = new System.Drawing.Size(181, 22);
+            this.menuItemSyncSession.Text = "Sync current session";
             this.menuItemSyncSession.Click += new System.EventHandler(this.menuItemSyncSession_Click);
             // 
             // status
             // 
-            this.status.Location = new System.Drawing.Point(0, 753);
+            this.status.Location = new System.Drawing.Point(0, 648);
             this.status.Name = "status";
             this.status.Padding = new System.Windows.Forms.Padding(1, 0, 16, 0);
-            this.status.Size = new System.Drawing.Size(1282, 22);
+            this.status.Size = new System.Drawing.Size(1119, 22);
             this.status.TabIndex = 2;
             this.status.Text = "statusStrip1";
             // 
@@ -145,7 +138,7 @@
             // 
             this.splitMain.Panel2.Controls.Add(this.gmap);
             this.splitMain.Panel2.Controls.Add(this.toolsMap);
-            this.splitMain.Size = new System.Drawing.Size(1282, 729);
+            this.splitMain.Size = new System.Drawing.Size(1119, 624);
             this.splitMain.SplitterDistance = 144;
             this.splitMain.SplitterWidth = 5;
             this.splitMain.TabIndex = 3;
@@ -159,7 +152,7 @@
             this.lbSessions.ItemHeight = 15;
             this.lbSessions.Location = new System.Drawing.Point(0, 25);
             this.lbSessions.Name = "lbSessions";
-            this.lbSessions.Size = new System.Drawing.Size(144, 704);
+            this.lbSessions.Size = new System.Drawing.Size(144, 599);
             this.lbSessions.TabIndex = 1;
             this.lbSessions.SelectedIndexChanged += new System.EventHandler(this.lbSessions_SelectedIndexChanged);
             // 
@@ -184,7 +177,7 @@
             this.btnConnectToServer.Size = new System.Drawing.Size(23, 22);
             this.btnConnectToServer.Text = "Set host";
             this.btnConnectToServer.ToolTipText = "Set IP address / Hostname of web service";
-            this.btnConnectToServer.Click += new System.EventHandler(this.menuItemSetIP_Click);
+            this.btnConnectToServer.Click += new System.EventHandler(this.menuItemSettings_Click);
             // 
             // btnUpdateSessions
             // 
@@ -195,7 +188,7 @@
             this.btnUpdateSessions.Size = new System.Drawing.Size(23, 22);
             this.btnUpdateSessions.Text = "Update session list";
             this.btnUpdateSessions.ToolTipText = "Get a fresh list of sessions from web service";
-            this.btnUpdateSessions.Click += new System.EventHandler(this.menuItemGetSessions_Click);
+            this.btnUpdateSessions.Click += new System.EventHandler(this.menuItemRequestSessionList_Click);
             // 
             // gmap
             // 
@@ -219,7 +212,7 @@
             this.gmap.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gmap.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gmap.ShowTileGridLines = false;
-            this.gmap.Size = new System.Drawing.Size(1133, 704);
+            this.gmap.Size = new System.Drawing.Size(970, 599);
             this.gmap.TabIndex = 1;
             this.gmap.Zoom = 9D;
             // 
@@ -231,7 +224,7 @@
             this.cboxMapProviders});
             this.toolsMap.Location = new System.Drawing.Point(0, 0);
             this.toolsMap.Name = "toolsMap";
-            this.toolsMap.Size = new System.Drawing.Size(1133, 25);
+            this.toolsMap.Size = new System.Drawing.Size(970, 25);
             this.toolsMap.TabIndex = 0;
             this.toolsMap.Text = "toolStrip2";
             // 
@@ -248,6 +241,8 @@
             // 
             // cboxMapProviders
             // 
+            this.cboxMapProviders.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.cboxMapProviders.BackColor = System.Drawing.SystemColors.Window;
             this.cboxMapProviders.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboxMapProviders.Items.AddRange(new object[] {
             "Google Map",
@@ -268,11 +263,18 @@
             this.cboxMapProviders.Size = new System.Drawing.Size(121, 25);
             this.cboxMapProviders.SelectedIndexChanged += new System.EventHandler(this.cboxMapProviders_SelectedIndexChanged);
             // 
+            // menuItemRequestSessionList
+            // 
+            this.menuItemRequestSessionList.Name = "menuItemRequestSessionList";
+            this.menuItemRequestSessionList.Size = new System.Drawing.Size(181, 22);
+            this.menuItemRequestSessionList.Text = "Request session list";
+            this.menuItemRequestSessionList.Click += new System.EventHandler(this.menuItemRequestSessionList_Click);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1282, 775);
+            this.ClientSize = new System.Drawing.Size(1119, 670);
             this.Controls.Add(this.splitMain);
             this.Controls.Add(this.status);
             this.Controls.Add(this.menu);
@@ -315,11 +317,11 @@
         private System.Windows.Forms.ToolStripButton btnConnectToServer;
         private GMap.NET.WindowsForms.GMapControl gmap;
         private System.Windows.Forms.ToolStripComboBox cboxMapProviders;
-        private System.Windows.Forms.ToolStripMenuItem menuItemSetIP;
-        private System.Windows.Forms.ToolStripMenuItem menuItemGetSessions;
+        private System.Windows.Forms.ToolStripMenuItem menuItemSettings;
         private System.Windows.Forms.ToolStripMenuItem menuItemAction;
         private System.Windows.Forms.ToolStripMenuItem menuItemSyncSession;
         private System.Windows.Forms.ToolStripButton btnSyncSession;
+        private System.Windows.Forms.ToolStripMenuItem menuItemRequestSessionList;
     }
 }
 

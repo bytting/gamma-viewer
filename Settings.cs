@@ -29,11 +29,13 @@ namespace gamma_viewer
     {
         public GVSettings()
         {
-            Hostname = "";
+            Hostname = Username = Password = "";            
             RequestFrequency = 2000;
         }
 
-        public string Hostname { get; set; }
+        public string Hostname { get; set; }        
+        public string Username { get; set; }
+        public string Password { get; set; }
         public int RequestFrequency { get; set; }
     }
 }

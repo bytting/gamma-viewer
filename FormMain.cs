@@ -123,8 +123,16 @@ namespace gamma_viewer
 
         void timer_Tick(object sender, EventArgs e)
         {
-            if (spectrums.Count < 1 || String.IsNullOrEmpty(settings.Hostname) || lbSessions.SelectedIndices.Count < 1)
+            if (lbSessions.SelectedIndices.Count < 1)
                 return;
+
+            if (String.IsNullOrEmpty(settings.Hostname)
+                || String.IsNullOrEmpty(settings.Username) 
+                || String.IsNullOrEmpty(settings.Password))
+            {
+                Log.Warn("Sync cancelled due to missing settings");
+                return;
+            }            
 
             String session = lbSessions.SelectedItems[0] as String;
 
@@ -141,6 +149,8 @@ namespace gamma_viewer
             try
             {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-spectrums/" + session + "/" + timeString);
+                string credentials = Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(settings.Username + ":" + settings.Password));
+                request.Headers.Add("Authorization", "Basic " + credentials);
                 request.Timeout = 5000;
                 request.Method = WebRequestMethods.Http.Get;
                 request.Accept = "application/json";
@@ -291,9 +301,11 @@ namespace gamma_viewer
             if (lbSessions.SelectedIndices.Count < 1)
                 return;
 
-            if (String.IsNullOrEmpty(settings.Hostname))
+            if (String.IsNullOrEmpty(settings.Hostname)
+                || String.IsNullOrEmpty(settings.Username)
+                || String.IsNullOrEmpty(settings.Password))
             {
-                MessageBox.Show("You must set a IP / Hostname to the web service first");
+                menuItemSettings_Click(sender, e);
                 return;
             }
 
@@ -303,6 +315,8 @@ namespace gamma_viewer
                 RemoveAllMarkers();
 
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-spectrums/" + session);
+                string credentials = Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(settings.Username + ":" + settings.Password));
+                request.Headers.Add("Authorization", "Basic " + credentials);
                 request.Timeout = 5000;
                 request.Method = WebRequestMethods.Http.Get;
                 request.Accept = "application/json";
@@ -327,27 +341,40 @@ namespace gamma_viewer
             }
         }
 
-        private void menuItemSetIP_Click(object sender, EventArgs e)
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            FormGetHostname form = new FormGetHostname(settings.Hostname);
+            timer.Stop();
+        }
+
+        private void menuItemSyncSession_Click(object sender, EventArgs e)
+        {
+            // sync
+        }
+
+        private void menuItemSettings_Click(object sender, EventArgs e)
+        {
+            FormSettings form = new FormSettings(settings);
             if (form.ShowDialog() != DialogResult.OK)
                 return;
 
-            settings.Hostname = form.Hostname;
             SaveSettings();
         }
 
-        private void menuItemGetSessions_Click(object sender, EventArgs e)
+        private void menuItemRequestSessionList_Click(object sender, EventArgs e)
         {
-            if(String.IsNullOrEmpty(settings.Hostname))
+            if (String.IsNullOrEmpty(settings.Hostname)
+                || String.IsNullOrEmpty(settings.Username)
+                || String.IsNullOrEmpty(settings.Password))
             {
-                MessageBox.Show("You must set a IP / Hostname to the web service first");
+                menuItemSettings_Click(sender, e);
                 return;
             }
 
             try
             {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-sessions");
+                string credentials = Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(settings.Username + ":" + settings.Password));
+                request.Headers.Add("Authorization", "Basic " + credentials);
                 request.Timeout = 5000;
                 request.Method = WebRequestMethods.Http.Get;
                 request.Accept = "application/json";
@@ -364,21 +391,11 @@ namespace gamma_viewer
                     lbSessions.Items.Add(session);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.Error("Get sessions error", ex);
                 MessageBox.Show("Get sessions error: " + ex.Message);
             }
-        }
-
-        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            timer.Stop();
-        }
-
-        private void menuItemSyncSession_Click(object sender, EventArgs e)
-        {
-            // sync
         }
     }    
 }
