@@ -90,6 +90,28 @@ namespace gamma_viewer
             timer.Start();
         }
 
+        private void LoadSettings()
+        {
+            if (!File.Exists(Env.SettingsFile))
+                SaveSettings();
+
+            // Deserialize settings from file
+            using (StreamReader sr = new StreamReader(Env.SettingsFile))
+            {
+                XmlSerializer x = new XmlSerializer(settings.GetType());
+                settings = x.Deserialize(sr) as GVSettings;
+            }
+        }
+
+        private void SaveSettings()
+        {
+            using (StreamWriter sw = new StreamWriter(Env.SettingsFile))
+            {
+                XmlSerializer x = new XmlSerializer(settings.GetType());
+                x.Serialize(sw, settings);
+            }
+        }
+
         public static ILog GetLog()
         {
             if (!LogInitialized)
@@ -121,89 +143,25 @@ namespace gamma_viewer
             return Log;
         }
 
-        void timer_Tick(object sender, EventArgs e)
-        {
-            if (lbSessions.SelectedIndices.Count < 1)
-                return;
-
-            if (String.IsNullOrEmpty(settings.Hostname)
-                || String.IsNullOrEmpty(settings.Username) 
-                || String.IsNullOrEmpty(settings.Password))
-            {
-                Log.Warn("Sync canceled due to missing settings");
-                return;
-            }
-
-            foreach (string session in lbSessions.SelectedItems)
-            {
-                if (!Spectrums.ContainsKey(session))
-                    continue;
-
-                DateTime lastSpectrumTime = new DateTime(1900, 1, 1);
-                foreach (Spectrum spec in Spectrums[session])
-                {
-                    if (spec.StartTime > lastSpectrumTime)
-                        lastSpectrumTime = spec.StartTime;
-                }
-
-                lastSpectrumTime.AddSeconds(1.0);
-                string timeString = lastSpectrumTime.ToString("yyyyMMdd_hhmmss");
-
-                try
-                {
-                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-spectrums/" + session + "/" + timeString);
-                    string credentials = Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(settings.Username + ":" + settings.Password));
-                    request.Headers.Add("Authorization", "Basic " + credentials);
-                    request.Timeout = 5000;
-                    request.Method = WebRequestMethods.Http.Get;
-                    request.Accept = "application/json";
-
-                    string jsonText;
-                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                    using (var sr = new StreamReader(response.GetResponseStream()))
-                        jsonText = sr.ReadToEnd();
-
-                    List<Spectrum> specs = JsonConvert.DeserializeObject<List<Spectrum>>(jsonText);
-                    foreach (Spectrum spec in specs)
-                    {
-                        Spectrums[session].Add(spec);
-                        AddMarker(spec);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Error("Timed request error", ex);
-                }
-            }
-        }
-
-        private void LoadSettings()
-        {
-            if (!File.Exists(Env.SettingsFile))
-                SaveSettings();
-
-            // Deserialize settings from file
-            using (StreamReader sr = new StreamReader(Env.SettingsFile))
-            {
-                XmlSerializer x = new XmlSerializer(settings.GetType());
-                settings = x.Deserialize(sr) as GVSettings;
-            }
-        }
-
-        private void SaveSettings()
-        {            
-            using (StreamWriter sw = new StreamWriter(Env.SettingsFile))
-            {
-                XmlSerializer x = new XmlSerializer(settings.GetType());
-                x.Serialize(sw, settings);
-            }
-        }
-        
         private void menuItemExit_Click(object sender, EventArgs e)
         {
             SaveSettings();
             Log.Info("Exiting GammaViewer");
             Close();
+        }
+
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            timer.Stop();
+        }
+
+        private void menuItemSettings_Click(object sender, EventArgs e)
+        {
+            FormSettings form = new FormSettings(settings);
+            if (form.ShowDialog() != DialogResult.OK)
+                return;
+
+            SaveSettings();
         }
 
         private void cboxMapProviders_SelectedIndexChanged(object sender, EventArgs e)
@@ -346,26 +304,12 @@ namespace gamma_viewer
                 Log.Error("Session select error", ex);
                 MessageBox.Show("Session select error: " + ex.Message);
             }
-        }
-
-        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            timer.Stop();
-        }
+        }        
 
         private void menuItemSyncSession_Click(object sender, EventArgs e)
         {
             // sync
-        }
-
-        private void menuItemSettings_Click(object sender, EventArgs e)
-        {
-            FormSettings form = new FormSettings(settings);
-            if (form.ShowDialog() != DialogResult.OK)
-                return;
-
-            SaveSettings();
-        }
+        }        
 
         private void menuItemRequestSessionList_Click(object sender, EventArgs e)
         {
@@ -403,6 +347,62 @@ namespace gamma_viewer
             {
                 Log.Error("Get sessions error", ex);
                 MessageBox.Show("Get sessions error: " + ex.Message);
+            }
+        }
+
+        void timer_Tick(object sender, EventArgs e)
+        {
+            if (lbSessions.SelectedIndices.Count < 1)
+                return;
+
+            if (String.IsNullOrEmpty(settings.Hostname)
+                || String.IsNullOrEmpty(settings.Username)
+                || String.IsNullOrEmpty(settings.Password))
+            {
+                Log.Warn("Sync canceled due to missing settings");
+                return;
+            }
+
+            foreach (string session in lbSessions.SelectedItems)
+            {
+                if (!Spectrums.ContainsKey(session))
+                    continue;
+
+                DateTime lastSpectrumTime = new DateTime(1900, 1, 1);
+                foreach (Spectrum spec in Spectrums[session])
+                {
+                    if (spec.StartTime > lastSpectrumTime)
+                        lastSpectrumTime = spec.StartTime;
+                }
+
+                lastSpectrumTime.AddSeconds(1.0);
+                string timeString = lastSpectrumTime.ToString("yyyyMMdd_hhmmss");
+
+                try
+                {
+                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://" + settings.Hostname + "/get-spectrums/" + session + "/" + timeString);
+                    string credentials = Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(settings.Username + ":" + settings.Password));
+                    request.Headers.Add("Authorization", "Basic " + credentials);
+                    request.Timeout = 5000;
+                    request.Method = WebRequestMethods.Http.Get;
+                    request.Accept = "application/json";
+
+                    string jsonText;
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    using (var sr = new StreamReader(response.GetResponseStream()))
+                        jsonText = sr.ReadToEnd();
+
+                    List<Spectrum> specs = JsonConvert.DeserializeObject<List<Spectrum>>(jsonText);
+                    foreach (Spectrum spec in specs)
+                    {
+                        Spectrums[session].Add(spec);
+                        AddMarker(spec);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Timed request error", ex);
+                }
             }
         }
     }    
